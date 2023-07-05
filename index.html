@@ -14,7 +14,7 @@
     <script type="module">
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-        import { getDatabase, ref, get, set, child, update, remove, onValue }
+        import { getDatabase, ref, get, set, onValue }
             from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js'
 
         const firebaseConfig = {
@@ -48,7 +48,6 @@
         function onImageClick (e) {
             const toggleImage = images.find(image => image.id !== parseInt(e.target.id))
 
-            console.log('toggleImage', toggleImage)
             set(ref(db, "mood/"), {
                 id: toggleImage.id,
                 name: toggleImage.name,
@@ -73,12 +72,11 @@
                 image.name = data.name
                 image.src = data.src
                 image.alt = data.alt
-                console.log(data);
+                document.title = data.name
             });
         }
 
         onImageLoad()
       </script>
-    <script src="script.js"></script>
 </body>
 </html>
