@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Happy</title>
+</head>
+<body>
+    <h1>Como esta seu humor hoje?</h1>
+
+    <img class="image" src="img/happy.webp" alt="Polvo de pelúcia com rosto feliz">
+
+    <script type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, get, set, child, update, remove, onValue }
+            from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js'
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwUj8R1BbR__gnUJFuirEpCdIeCG5adEc",
+            authDomain: "happy-mad.firebaseapp.com",
+            projectId: "happy-mad",
+            storageBucket: "happy-mad.appspot.com",
+            messagingSenderId: "1024751231595",
+            appId: "1:1024751231595:web:177c7c6b8a1d589c7d072e",
+            measurementId: "G-Q9TWYMEEZV"
+        };
+        
+        const firebase = initializeApp(firebaseConfig);
+        const db = getDatabase();
+
+        const images = [{
+            id: 1,
+            name: 'Happy',
+            src: 'img/happy.webp',
+            alt: 'Polvo de pelúcia com rosto feliz'
+        }, {
+            id: 2,
+            name: 'Mad',
+            src: 'img/mad.webp',
+            alt: 'Polvo de pelúcia com rosto irritado'
+        }]
+        
+        const image = document.querySelector(".image")
+        image.addEventListener("click", onImageClick)
+        
+        function onImageClick (e) {
+            const toggleImage = images.find(image => image.id !== parseInt(e.target.id))
+
+            console.log('toggleImage', toggleImage)
+            set(ref(db, "mood/"), {
+                id: toggleImage.id,
+                name: toggleImage.name,
+                src: toggleImage.src,
+                alt: toggleImage.alt,
+            })
+            .then(() => {
+                document.title = toggleImage.name
+                console.log("Salvo com sucesso!");
+            })
+            .catch((error) => {
+                console.error("Erro ao salvar: ", error);
+            });
+        }
+
+        function onImageLoad() {
+            const starCountRef = ref(db, 'mood/');
+            onValue(starCountRef, (snapshot) => {
+                const data = snapshot.val();
+
+                image.id = data.id
+                image.name = data.name
+                image.src = data.src
+                image.alt = data.alt
+                console.log(data);
+            });
+        }
+
+        onImageLoad()
+      </script>
+    <script src="script.js"></script>
+</body>
+</html>
