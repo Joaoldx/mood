@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Histórico</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>Mood</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+         <tbody id="tbody">
+
+         </tbody>
+    </table>
+
+    <input id="menu-hamburguer" type="checkbox" />
+
+    <label for="menu-hamburguer">
+        <div class="menu">
+            <span class="hamburguer"></span>
+        </div>
+    </label>
+
+    <ul>
+        <li><a href='/index.html'>Home</a></li>
+        <li><a href='/historico.html'>Histórico</a></li>
+        <li><a href='https://github.com/Joaoldx/mood'>Repositório Github</a></li>
+    </ul>
+
+    <script defer type="module">
+
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+        import { getDatabase, ref, get, set, onValue }
+            from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js'
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAwUj8R1BbR__gnUJFuirEpCdIeCG5adEc",
+            authDomain: "happy-mad.firebaseapp.com",
+            projectId: "happy-mad",
+            storageBucket: "happy-mad.appspot.com",
+            messagingSenderId: "1024751231595",
+            appId: "1:1024751231595:web:177c7c6b8a1d589c7d072e",
+            measurementId: "G-Q9TWYMEEZV"
+        };
+        
+        const firebase = initializeApp(firebaseConfig);
+        const db = getDatabase();
+        
+        const tbody = document.getElementById("tbody")
+
+        const moods = await loadHistory()
+
+        const dateOptions = { dateStyle: 'full', timeStyle: 'long', timeZone: 'America/Sao_Paulo' }
+
+        moods.forEach(mood => {
+            const tr = document.createElement('tr')
+            const tdName = document.createElement('td')
+            const tdDate = document.createElement('td')
+            const txtName = document.createElement('span')
+            const txtDate = document.createElement('span')
+            
+            const date = new Intl.DateTimeFormat('pt-br', dateOptions).format(mood.timestamp)
+            
+            txtName.innerText = mood.name
+            txtDate.innerText = date
+            
+            tdName.appendChild(txtName)
+            tdDate.appendChild(txtDate)
+            tr.appendChild(tdName)
+            tr.appendChild(tdDate)
+            tbody.appendChild(tr)
+        })
+
+        async function loadHistory() {
+            const moodRef = ref(db, 'mood/');
+            const snapshot = await get(moodRef)
+            const data = snapshot.val();
+            
+            const moods = data.sort((a, b) => a.timestamp < b.timestamp).reverse()
+            return moods
+        }
+      </script>
+</body>
+</html>

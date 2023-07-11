@@ -11,7 +11,19 @@
 
     <img class="image" src="img/happy.webp" alt="Polvo de pelúcia com rosto feliz">
 
-    <script type="module">
+    <input id="menu-hamburguer" type="checkbox" />
+
+    <label for="menu-hamburguer">
+        <div class="menu">
+            <span class="hamburguer"></span>
+        </div>
+    </label>
+
+    <ul>
+        <li><a href='/index.html'>Home</a></li>
+        <li><a href='/historico.html'>Histórico</a></li>
+        <li><a href='https://github.com/Joaoldx/mood'>Repositório Github</a></li>
+    </ul>
 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, get, set, onValue }
