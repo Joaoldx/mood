@@ -25,6 +25,8 @@
         <li><a href='https://github.com/Joaoldx/mood'>Repositório Github</a></li>
     </ul>
 
+    <script defer type="module">
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
         import { getDatabase, ref, get, set, onValue }
             from 'https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js'
@@ -56,18 +58,38 @@
         
         const image = document.querySelector(".image")
         image.addEventListener("click", onImageClick)
+
+        const moods = await onImageLoad() || []
         
         function onImageClick (e) {
             const toggleImage = images.find(image => image.id !== parseInt(e.target.id))
-
-            set(ref(db, "mood/"), {
+            
+            const currentMood = {
                 id: toggleImage.id,
                 name: toggleImage.name,
                 src: toggleImage.src,
                 alt: toggleImage.alt,
-            })
+                timestamp: Date.now()
+            }
+
+            moods.push(currentMood)
+
+            updateCurrentMood(toggleImage)            
+            saveMood(moods, toggleImage.name)
+        }
+        
+        function updateCurrentMood (updateCurrentMood) {
+            image.id = updateCurrentMood.id
+            image.name = updateCurrentMood.name
+            image.src = updateCurrentMood.src
+            image.alt = updateCurrentMood.alt
+            document.title = updateCurrentMood.name
+        }
+        
+        function saveMood (moods, imageName) {
+            set(ref(db, "mood/"), moods)
             .then(() => {
-                document.title = toggleImage.name
+                document.title = imageName
                 console.log("Salvo com sucesso!");
             })
             .catch((error) => {
@@ -75,20 +97,19 @@
             });
         }
 
-        function onImageLoad() {
-            const starCountRef = ref(db, 'mood/');
-            onValue(starCountRef, (snapshot) => {
-                const data = snapshot.val();
+        async function onImageLoad() {
+            const moodRef = ref(db, 'mood/');            
+            const snapshot = await get(moodRef)
+            const data = snapshot.val();
 
-                image.id = data.id
-                image.name = data.name
-                image.src = data.src
-                image.alt = data.alt
-                document.title = data.name
-            });
+            if (typeof data !== Array) return           
+
+            const moods = data.sort((a, b) => a.timestamp < b.timestamp).reverse()
+
+            updateCurrentMood(moods[0])
+            
+            return data
         }
-
-        onImageLoad()
       </script>
 </body>
 </html>
